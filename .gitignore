@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+.pycache/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+
+# Node
+node_modules/
+dist/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Local model assets and generated biometric artifacts
+backend/.insightface/
+backend/demo-images/
+backend/data/face_templates.json
+
+# OS files
+.DS_Store
