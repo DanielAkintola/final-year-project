@@ -8,10 +8,11 @@ import { formatDateTime } from './electionUtils';
 
 type ElectionDetailPanelProps = {
   election: Election;
-  onStatusChange: (status: ElectionStatus) => void;
+  onStatusChange: (status: ElectionStatus) => void | Promise<void>;
+  disabled?: boolean;
 };
 
-export function ElectionDetailPanel({ election, onStatusChange }: ElectionDetailPanelProps) {
+export function ElectionDetailPanel({ election, onStatusChange, disabled = false }: ElectionDetailPanelProps) {
   return (
     <Card className="election-detail-card">
       <CardHeader>
@@ -43,25 +44,25 @@ export function ElectionDetailPanel({ election, onStatusChange }: ElectionDetail
 
         <div className="action-row">
           {election.status === 'DRAFT' ? (
-            <Button onClick={() => onStatusChange('PUBLISHED')}>
+            <Button disabled={disabled} onClick={() => onStatusChange('PUBLISHED')}>
               <Send size={16} />
               Publish
             </Button>
           ) : null}
           {election.status === 'PUBLISHED' || election.status === 'PAUSED' ? (
-            <Button onClick={() => onStatusChange('ACTIVE')}>
+            <Button disabled={disabled} onClick={() => onStatusChange('ACTIVE')}>
               <Play size={16} />
               Activate
             </Button>
           ) : null}
           {election.status === 'ACTIVE' ? (
-            <Button onClick={() => onStatusChange('PAUSED')} variant="secondary">
+            <Button disabled={disabled} onClick={() => onStatusChange('PAUSED')} variant="secondary">
               <Pause size={16} />
               Pause
             </Button>
           ) : null}
           {election.status !== 'CLOSED' && election.status !== 'ARCHIVED' ? (
-            <Button onClick={() => onStatusChange('CLOSED')} variant="danger">
+            <Button disabled={disabled} onClick={() => onStatusChange('CLOSED')} variant="danger">
               <StopCircle size={16} />
               Close
             </Button>

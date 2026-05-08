@@ -1,40 +1,103 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { PageHeader } from '../components/PageHeader';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
-import { initialElectionForm, seedElections } from '../data/elections';
+import { initialElectionForm } from '../data/elections';
 import { ElectionCard } from '../features/elections/ElectionCard';
 import { ElectionDetailPanel } from '../features/elections/ElectionDetailPanel';
 import { ElectionForm } from '../features/elections/ElectionForm';
 import { ElectionTimeline } from '../features/elections/ElectionTimeline';
-import { applyElectionStatus, createElectionFromForm } from '../features/elections/electionUtils';
+import { electionsService } from '../services/electionsService';
 import type { Election, ElectionFormValues, ElectionStatus } from '../types/election';
 
 export function ElectionsPage() {
-  const [elections, setElections] = useState<Election[]>(seedElections);
-  const [selectedElectionId, setSelectedElectionId] = useState(seedElections[0]?.id);
+  const [elections, setElections] = useState<Election[]>([]);
+  const [selectedElectionId, setSelectedElectionId] = useState<string | undefined>(undefined);
   const [formValues, setFormValues] = useState<ElectionFormValues>(initialElectionForm);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const selectedElection = elections.find((election) => election.id === selectedElectionId) ?? elections[0];
+  useEffect(() => {
+    let isMounted = true;
 
-  function createElection() {
-    const election = createElectionFromForm(formValues);
+    async function loadElections() {
+      setIsLoading(true);
+      setError(null);
 
-    setElections((current) => [election, ...current]);
-    setSelectedElectionId(election.id);
-    setFormValues(initialElectionForm);
+      try {
+        const loadedElections = await electionsService.listElections();
+
+        if (!isMounted) {
+          return;
+        }
+
+        setElections(loadedElections);
+        setSelectedElectionId((current) => current ?? loadedElections[0]?.id);
+      } catch (loadError) {
+        if (!isMounted) {
+          return;
+        }
+
+        const message = loadError instanceof Error ? loadError.message : 'Failed to load elections.';
+        setError(message);
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    loadElections();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const selectedElection = useMemo(
+    () => elections.find((election) => election.id === selectedElectionId) ?? elections[0],
+    [elections, selectedElectionId]
+  );
+
+  async function createElection() {
+    setIsSaving(true);
+    setError(null);
+
+    try {
+      const election = await electionsService.createElection(formValues);
+
+      setElections((current) => [election, ...current]);
+      setSelectedElectionId(election.id);
+      setFormValues(initialElectionForm);
+    } catch (createError) {
+      const message = createError instanceof Error ? createError.message : 'Failed to create election.';
+      setError(message);
+    } finally {
+      setIsSaving(false);
+    }
   }
 
-  function updateSelectedElectionStatus(status: ElectionStatus) {
+  async function updateSelectedElectionStatus(status: ElectionStatus) {
     if (!selectedElection) {
       return;
     }
 
-    setElections((current) =>
-      current.map((election) =>
-        election.id === selectedElection.id ? applyElectionStatus(election, status) : election
-      )
-    );
+    setIsSaving(true);
+    setError(null);
+
+    try {
+      const updatedElection = await electionsService.updateElectionStatus(selectedElection.id, status);
+
+      setElections((current) =>
+        current.map((election) => (election.id === updatedElection.id ? updatedElection : election))
+      );
+    } catch (statusError) {
+      const message = statusError instanceof Error ? statusError.message : 'Failed to update election status.';
+      setError(message);
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   return (
@@ -53,6 +116,8 @@ export function ElectionsPage() {
               <CardDescription>Select an election to inspect lifecycle, rules, and timing.</CardDescription>
             </CardHeader>
             <CardContent className="election-list">
+              {isLoading ? <p>Loading elections...</p> : null}
+              {!isLoading && elections.length === 0 ? <p>No elections found yet.</p> : null}
               {elections.map((election) => (
                 <ElectionCard
                   election={election}
@@ -64,13 +129,24 @@ export function ElectionsPage() {
             </CardContent>
           </Card>
 
-          <ElectionForm values={formValues} onChange={setFormValues} onSubmit={createElection} />
+          {error ? <p role="alert">{error}</p> : null}
+
+          <ElectionForm
+            disabled={isLoading || isSaving}
+            values={formValues}
+            onChange={setFormValues}
+            onSubmit={createElection}
+          />
         </div>
 
         <aside className="elections-side">
           {selectedElection ? (
             <>
-              <ElectionDetailPanel election={selectedElection} onStatusChange={updateSelectedElectionStatus} />
+              <ElectionDetailPanel
+                disabled={isLoading || isSaving}
+                election={selectedElection}
+                onStatusChange={updateSelectedElectionStatus}
+              />
               <ElectionTimeline election={selectedElection} />
             </>
           ) : null}

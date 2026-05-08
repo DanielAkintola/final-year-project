@@ -11,19 +11,85 @@ import { PartiesPage } from '../pages/PartiesPage';
 import { ResultsPage } from '../pages/ResultsPage';
 import { SettingsPage } from '../pages/SettingsPage';
 import { VotersPage } from '../pages/VotersPage';
+import type { ComponentType } from 'react';
+import type { AdminRole } from '../types';
 
-export const adminRoutes = [
-  { path: 'dashboard', Component: DashboardPage },
-  { path: 'elections', Component: ElectionsPage },
-  { path: 'geography', Component: GeographyPage },
-  { path: 'parties', Component: PartiesPage },
-  { path: 'candidates', Component: CandidatesPage },
-  { path: 'ballot-builder', Component: BallotBuilderPage },
-  { path: 'voters', Component: VotersPage },
-  { path: 'biometric-review', Component: BiometricReviewPage },
-  { path: 'monitoring', Component: MonitoringPage },
-  { path: 'results', Component: ResultsPage },
-  { path: 'audit-logs', Component: AuditLogsPage },
-  { path: 'admin-users', Component: AdminUsersPage },
-  { path: 'settings', Component: SettingsPage },
+export type AdminRoute = {
+  path: string;
+  Component: ComponentType;
+  allowedRoles: AdminRole[];
+};
+
+export const adminRoutes: AdminRoute[] = [
+  {
+    path: 'dashboard',
+    Component: DashboardPage,
+    allowedRoles: [
+      'SUPER_ADMIN',
+      'ELECTION_ADMIN',
+      'REGISTRATION_OFFICER',
+      'MONITORING_OFFICER',
+      'RESULTS_OFFICER',
+    ],
+  },
+  {
+    path: 'elections',
+    Component: ElectionsPage,
+    allowedRoles: ['SUPER_ADMIN', 'ELECTION_ADMIN'],
+  },
+  {
+    path: 'geography',
+    Component: GeographyPage,
+    allowedRoles: ['SUPER_ADMIN', 'ELECTION_ADMIN'],
+  },
+  {
+    path: 'parties',
+    Component: PartiesPage,
+    allowedRoles: ['SUPER_ADMIN', 'ELECTION_ADMIN'],
+  },
+  {
+    path: 'candidates',
+    Component: CandidatesPage,
+    allowedRoles: ['SUPER_ADMIN', 'ELECTION_ADMIN'],
+  },
+  {
+    path: 'ballot-builder',
+    Component: BallotBuilderPage,
+    allowedRoles: ['SUPER_ADMIN', 'ELECTION_ADMIN'],
+  },
+  {
+    path: 'voters',
+    Component: VotersPage,
+    allowedRoles: ['SUPER_ADMIN', 'REGISTRATION_OFFICER'],
+  },
+  {
+    path: 'biometric-review',
+    Component: BiometricReviewPage,
+    allowedRoles: ['SUPER_ADMIN', 'REGISTRATION_OFFICER', 'MONITORING_OFFICER'],
+  },
+  {
+    path: 'monitoring',
+    Component: MonitoringPage,
+    allowedRoles: ['SUPER_ADMIN', 'MONITORING_OFFICER'],
+  },
+  {
+    path: 'results',
+    Component: ResultsPage,
+    allowedRoles: ['SUPER_ADMIN', 'RESULTS_OFFICER'],
+  },
+  {
+    path: 'audit-logs',
+    Component: AuditLogsPage,
+    allowedRoles: ['SUPER_ADMIN', 'ELECTION_ADMIN'],
+  },
+  {
+    path: 'admin-users',
+    Component: AdminUsersPage,
+    allowedRoles: ['SUPER_ADMIN'],
+  },
+  {
+    path: 'settings',
+    Component: SettingsPage,
+    allowedRoles: ['SUPER_ADMIN'],
+  },
 ];
