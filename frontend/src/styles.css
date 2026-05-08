@@ -313,11 +313,13 @@ body { font-feature-settings: "ss01", "cv11"; -webkit-font-smoothing: antialiase
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
-  padding: 18px;
-  display: flex; flex-direction: column; gap: 8px;
+  padding: 20px;
+  display: flex; flex-direction: column; gap: 12px;
   transition: border-color 120ms ease, background 120ms ease;
 }
 .section-card:hover { border-color: var(--border-strong); background: #fcfcfd; transform: none; box-shadow: none; }
+.section-card > h3 { line-height: 1.3 !important; margin: 0; }
+.section-card > p { line-height: 1.55 !important; margin: 0; }
 .section-card-link { position: absolute; inset: 0; border-radius: var(--radius-card); }
 .section-card-link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .section-title-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
