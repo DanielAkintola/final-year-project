@@ -1,13 +1,29 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { LogOut } from "lucide-react";
 
-import { getNavigationForRole } from "../data/adminNavigation";
+import { getNavigationForRole, type AdminNavItem } from "../data/adminNavigation";
 import { useAuth } from "../contexts/AuthContext";
+
+const GROUPS: { label: string; paths: string[] }[] = [
+  { label: "Operations", paths: ["/app/dashboard", "/app/elections", "/app/monitoring", "/app/results"] },
+  { label: "Identity", paths: ["/app/voters", "/app/biometric-review"] },
+  { label: "Governance", paths: ["/app/geography", "/app/parties", "/app/candidates", "/app/ballot-builder"] },
+  { label: "System", paths: ["/app/audit-logs", "/app/admin-users", "/app/settings"] },
+];
+
+function groupItems(items: AdminNavItem[]) {
+  return GROUPS.map((g) => ({
+    label: g.label,
+    items: g.paths.map((p) => items.find((i) => i.path === p)).filter(Boolean) as AdminNavItem[],
+  })).filter((g) => g.items.length > 0);
+}
 
 export function Sidebar() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const navigation = getNavigationForRole(user?.role);
+  const groups = groupItems(navigation);
+  const initial = user?.fullName?.charAt(0).toUpperCase() ?? "A";
 
   function handleLogout() {
     logout();
@@ -15,65 +31,49 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="fixed left-0 top-0 h-full w-64 bg-on-background shadow-lg flex flex-col py-gutter px-2 z-50">
-      {/* Brand */}
-      <div className="px-4 mb-stack-lg">
-        <div className="flex items-center gap-3 mb-1">
-          <div className="w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center text-on-primary-container font-bold text-headline-md">
-            OV
-          </div>
-          <span className="font-headline-md text-headline-md font-bold text-on-primary">
-            OndoVote
-          </span>
+    <aside className="app-sidebar">
+      <div className="app-sidebar-brand">
+        <div className="mark">OV</div>
+        <div className="flex flex-col leading-tight">
+          <span className="name">OndoVote</span>
+          <span className="tag">Election Admin</span>
         </div>
-        <p className="font-body-md text-body-md text-primary-fixed-dim opacity-70 px-1">
-          Election Admin
-        </p>
       </div>
 
-      {/* Navigation */}
-      <nav
-        className="flex-1 overflow-y-auto custom-scrollbar"
-        aria-label="Admin sections"
-      >
-        {navigation.map((item) => {
-          const Icon = item.icon;
-
-          return (
-            <NavLink
-              key={item.path}
-              to={item.path}
-              className={({ isActive }) =>
-                `text-primary-fixed-dim hover:bg-on-primary-fixed-variant rounded-lg mx-2 my-1 flex items-center gap-3 px-4 py-2 transition-all ${
-                  isActive
-                    ? "bg-primary-container text-on-primary-container font-bold"
-                    : ""
-                }`
-              }
-            >
-              <Icon size={18} />
-              <span className="font-body-md">{item.label}</span>
-            </NavLink>
-          );
-        })}
+      <nav className="app-sidebar-nav custom-scrollbar" aria-label="Admin sections">
+        {groups.map((group) => (
+          <div key={group.label} className="nav-group">
+            <div className="nav-group-label">{group.label}</div>
+            {group.items.map((item) => {
+              const Icon = item.icon;
+              return (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  className={({ isActive }) => `nav-item ${isActive ? "nav-item-active" : ""}`}
+                >
+                  <Icon size={16} />
+                  <span>{item.label}</span>
+                </NavLink>
+              );
+            })}
+          </div>
+        ))}
       </nav>
 
-      {/* Footer */}
-      <div className="mt-auto px-2 pt-stack-md border-t border-white/10">
-        <div className="flex items-center gap-3 px-4 py-3 mb-4">
-          <span className="material-symbols-outlined text-primary-fixed-dim">
-            account_circle
-          </span>
-          <span className="text-primary-fixed-dim font-label-md truncate">
-            {user?.fullName ?? "Admin User"}
-          </span>
+      <div className="app-sidebar-foot">
+        <div className="app-sidebar-user">
+          <div className="avatar">{initial}</div>
+          <div className="flex flex-col leading-tight min-w-0">
+            <span className="truncate" style={{ fontWeight: 500 }}>
+              {user?.fullName ?? "Admin User"}
+            </span>
+            <span style={{ fontSize: 11, color: "var(--text-subtle)" }}>{user?.role ?? ""}</span>
+          </div>
         </div>
-        <button
-          onClick={handleLogout}
-          className="w-full bg-primary/20 hover:bg-primary/40 text-on-primary py-3 rounded-lg font-bold transition-all"
-          type="button"
-        >
-          Logout
+        <button onClick={handleLogout} className="ui-button ui-button-ghost" type="button" style={{ justifyContent: "flex-start" }}>
+          <LogOut size={14} />
+          Sign out
         </button>
       </div>
     </aside>
