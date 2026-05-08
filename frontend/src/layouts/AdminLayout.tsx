@@ -5,11 +5,11 @@ import { TopAppBar } from "../components/TopAppBar";
 
 export function AdminLayout() {
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
+    <div className="min-h-screen">
       <Sidebar />
-      <main className="ml-64 flex-1 h-screen overflow-y-auto bg-surface">
+      <main className="app-content">
         <TopAppBar />
-        <div className="p-gutter max-w-container-max mx-auto space-y-stack-lg pb-stack-lg">
+        <div className="app-content-inner">
           <Outlet />
         </div>
       </main>
