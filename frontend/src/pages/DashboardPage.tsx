@@ -205,43 +205,52 @@ export function DashboardPage() {
   }, []);
 
   return (
-    <div className="space-y-stack-lg">
-      {/* Hero Section with Stats */}
-      <HeroSection
-        eyebrow="Ondo State Governorship Election"
-        title="Admin control center for monitoring live results."
-        description="Real-time telemetry from across 18 Local Government Areas. Data integrity verified by blockchain audit logs."
-        stats={[
-          {
-            label: "Total Votes",
-            value: liveCounters.votesCast.toLocaleString(),
-            color: "primary",
-          },
-          {
-            label: "Turnout",
-            value: `${turnoutPercentage}%`,
-            color: "tertiary",
-          },
-          {
-            label: "Units Reporting",
-            value: `3,002/3,933`,
-            color: "error",
-          },
-        ]}
-      />
+    <div className="flex flex-col gap-8">
+      {/* Page header */}
+      <header className="page-header">
+        <div className="page-header-text">
+          <span className="eyebrow">Ondo State Governorship Election</span>
+          <h1 className="page-header-title">Live operations</h1>
+          <p className="page-header-desc">
+            Real-time telemetry from 18 Local Government Areas. Data integrity verified by blockchain audit logs.
+          </p>
+        </div>
+        <div className="page-header-actions">
+          <Button type="button" variant="secondary" onClick={refreshLiveCounters}>
+            <RefreshCcw size={14} />
+            Refresh
+          </Button>
+        </div>
+      </header>
 
-      {/* Refresh Button */}
-      <div>
-        <Button type="button" variant="secondary" onClick={refreshLiveCounters}>
-          <RefreshCcw size={16} />
-          Refresh Live Metrics
-        </Button>
+      {/* KPI strip */}
+      <div className="kpi-strip">
+        <div className="kpi-tile">
+          <span className="label">Total votes</span>
+          <span className="value accent tabular">{liveCounters.votesCast.toLocaleString()}</span>
+          <span className="delta">Updated {new Date(liveCounters.lastUpdatedAt).toLocaleTimeString()}</span>
+        </div>
+        <div className="kpi-tile">
+          <span className="label">Turnout</span>
+          <span className="value tabular">{turnoutPercentage}%</span>
+          <span className="delta">of {mockTurnoutStats.totalRegisteredVoters.toLocaleString()} registered</span>
+        </div>
+        <div className="kpi-tile">
+          <span className="label">Units reporting</span>
+          <span className="value tabular">3,002 / 3,933</span>
+          <span className="delta">76% reporting</span>
+        </div>
+        <div className="kpi-tile">
+          <span className="label">Active alerts</span>
+          <span className="value tabular">{liveCounters.duplicateVoteAttempts + liveCounters.failedBiometricAttempts}</span>
+          <span className="delta">Security & biometric</span>
+        </div>
       </div>
 
       {/* Main Analytics Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Main Live Map */}
-        <div className="lg:col-span-8 flex flex-col gap-gutter">
+        <div className="lg:col-span-7 flex flex-col gap-4">
           <VoteDistributionMap
             mapImageUrl="https://lh3.googleusercontent.com/aida-public/AB6AXuBC1hWpD2P6t1-jJrMpbcLO6YP14GUP3HTckMgpwG9YrcxNG0Ak0JOqHWjaMSV-eUjZAQ7438zyCTuNgJWjUG9rj3icY6mOVEi7dAI6V_Zndn2UvLNi3iPG1H0v5HXRSwtkra8oWO69L4P3YxPZ-cPqngqz7KTFkeUQmERWtDWQiRjMavbmkgrxRUV1dkpupOiYPoctAgOW9MRfUslr2GiV7lJmD7rxsTpaPMDOWu71F298D52AZIJW01KnXeuv-pMvR84tp0MKCNk"
             overlays={mapOverlays}

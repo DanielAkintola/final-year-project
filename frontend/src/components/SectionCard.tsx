@@ -1,6 +1,6 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink } from "react-router-dom";
 
-import type { AdminNavItem } from '../data/adminNavigation';
+import type { AdminNavItem } from "../data/adminNavigation";
 
 type SectionCardProps = {
   item: AdminNavItem;
@@ -8,21 +8,17 @@ type SectionCardProps = {
 
 export function SectionCard({ item }: SectionCardProps) {
   const Icon = item.icon;
-
   return (
-    <NavLink className="section-card-link" to={item.path}>
-      <article className="section-card">
+    <article className="section-card">
+      <NavLink className="section-card-link" to={item.path} aria-label={item.label} />
+      <div className="section-title-row">
         <div className="section-icon">
-          <Icon size={22} />
+          <Icon size={16} />
         </div>
-        <div>
-          <div className="section-title-row">
-            <h2>{item.label}</h2>
-            <span data-status={item.status}>{item.status}</span>
-          </div>
-          <p>{item.description}</p>
-        </div>
-      </article>
-    </NavLink>
+        <span className="ui-badge ui-badge-neutral">{item.status}</span>
+      </div>
+      <h3 style={{ fontSize: 14, fontWeight: 600, color: "var(--text)", margin: 0 }}>{item.label}</h3>
+      <p style={{ fontSize: 12, color: "var(--text-muted)", margin: 0, lineHeight: 1.5 }}>{item.description}</p>
+    </article>
   );
 }
