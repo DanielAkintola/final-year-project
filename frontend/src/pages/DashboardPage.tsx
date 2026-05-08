@@ -205,43 +205,52 @@ export function DashboardPage() {
   }, []);
 
   return (
-    <div className="space-y-stack-lg">
-      {/* Hero Section with Stats */}
-      <HeroSection
-        eyebrow="Ondo State Governorship Election"
-        title="Admin control center for monitoring live results."
-        description="Real-time telemetry from across 18 Local Government Areas. Data integrity verified by blockchain audit logs."
-        stats={[
-          {
-            label: "Total Votes",
-            value: liveCounters.votesCast.toLocaleString(),
-            color: "primary",
-          },
-          {
-            label: "Turnout",
-            value: `${turnoutPercentage}%`,
-            color: "tertiary",
-          },
-          {
-            label: "Units Reporting",
-            value: `3,002/3,933`,
-            color: "error",
-          },
-        ]}
-      />
+    <div className="flex flex-col gap-8">
+      {/* Page header */}
+      <header className="page-header">
+        <div className="page-header-text">
+          <span className="eyebrow">Ondo State Governorship Election</span>
+          <h1 className="page-header-title">Live operations</h1>
+          <p className="page-header-desc">
+            Real-time telemetry from 18 Local Government Areas. Data integrity verified by blockchain audit logs.
+          </p>
+        </div>
+        <div className="page-header-actions">
+          <Button type="button" variant="secondary" onClick={refreshLiveCounters}>
+            <RefreshCcw size={14} />
+            Refresh
+          </Button>
+        </div>
+      </header>
 
-      {/* Refresh Button */}
-      <div>
-        <Button type="button" variant="secondary" onClick={refreshLiveCounters}>
-          <RefreshCcw size={16} />
-          Refresh Live Metrics
-        </Button>
+      {/* KPI strip */}
+      <div className="kpi-strip">
+        <div className="kpi-tile">
+          <span className="label">Total votes</span>
+          <span className="value accent tabular">{liveCounters.votesCast.toLocaleString()}</span>
+          <span className="delta">Updated {new Date(liveCounters.lastUpdatedAt).toLocaleTimeString()}</span>
+        </div>
+        <div className="kpi-tile">
+          <span className="label">Turnout</span>
+          <span className="value tabular">{turnoutPercentage}%</span>
+          <span className="delta">of {mockTurnoutStats.totalRegisteredVoters.toLocaleString()} registered</span>
+        </div>
+        <div className="kpi-tile">
+          <span className="label">Units reporting</span>
+          <span className="value tabular">3,002 / 3,933</span>
+          <span className="delta">76% reporting</span>
+        </div>
+        <div className="kpi-tile">
+          <span className="label">Active alerts</span>
+          <span className="value tabular">{liveCounters.duplicateVoteAttempts + liveCounters.failedBiometricAttempts}</span>
+          <span className="delta">Security & biometric</span>
+        </div>
       </div>
 
       {/* Main Analytics Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Main Live Map */}
-        <div className="lg:col-span-8 flex flex-col gap-gutter">
+        <div className="lg:col-span-7 flex flex-col gap-4">
           <VoteDistributionMap
             mapImageUrl="https://lh3.googleusercontent.com/aida-public/AB6AXuBC1hWpD2P6t1-jJrMpbcLO6YP14GUP3HTckMgpwG9YrcxNG0Ak0JOqHWjaMSV-eUjZAQ7438zyCTuNgJWjUG9rj3icY6mOVEi7dAI6V_Zndn2UvLNi3iPG1H0v5HXRSwtkra8oWO69L4P3YxPZ-cPqngqz7KTFkeUQmERWtDWQiRjMavbmkgrxRUV1dkpupOiYPoctAgOW9MRfUslr2GiV7lJmD7rxsTpaPMDOWu71F298D52AZIJW01KnXeuv-pMvR84tp0MKCNk"
             overlays={mapOverlays}
@@ -259,42 +268,41 @@ export function DashboardPage() {
         </div>
 
         {/* Side Analytics: Party Counts & Leaderboard */}
-        <div className="lg:col-span-4 space-y-gutter">
-          {/* Leader Card */}
+        <div className="lg:col-span-5 flex flex-col gap-4">
           <LeaderCard
             candidateName="Chief Olumide Adeyemi"
             partyName="All Progressives Congress (APC)"
             votes={945302}
             percentage={50.4}
           />
-
-          {/* Party Breakdown */}
           <PartyPerformanceChart parties={partyPerformanceData} />
-
-          {/* Security Monitoring */}
           <SecurityMonitoringCard alerts={securityAlerts} />
         </div>
       </div>
 
-      {/* Navigation Sections Grid */}
-      <div className="pt-stack-lg border-t border-outline-variant">
-        <h2 className="font-headline-md text-on-background mb-stack-lg">
-          Available Modules
-        </h2>
+      {/* Modules */}
+      <section className="flex flex-col gap-4">
+        <div className="flex items-end justify-between">
+          <h2 style={{ fontSize: 16, fontWeight: 600, color: "var(--text)", letterSpacing: "-0.005em" }}>
+            Modules
+          </h2>
+          <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
+            {visibleNavigation.length} available
+          </span>
+        </div>
         <div className="section-grid">
           {visibleNavigation.map((item) => (
             <SectionCard item={item} key={item.path} />
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* Footer */}
-      <footer className="p-gutter text-center border-t border-outline-variant mt-stack-lg">
-        <p className="text-label-md text-outline">
-          © 2024 Ondo State Independent Electoral Commission (ODIEC). All
-          election data is encrypted and verified via decentralized consensus.
+      <footer style={{ paddingTop: 24, borderTop: "1px solid var(--border)", textAlign: "center" }}>
+        <p style={{ fontSize: 11, color: "var(--text-subtle)" }}>
+          © 2024 Ondo State Independent Electoral Commission (ODIEC). All election data is encrypted and verified via decentralized consensus.
         </p>
       </footer>
     </div>
   );
 }
+
