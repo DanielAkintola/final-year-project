@@ -1,4 +1,5 @@
-﻿@import "tailwindcss";
+@import "tailwindcss";
+@config "../tailwind.config.cjs";
 
 /* Glass Card Style - Premium Glassmorphism */
 .glass-card {
