@@ -453,3 +453,33 @@ input[type="checkbox"].geo-checkbox { display: inline-block; width: 14px; height
 }
 .geo-empty-title { font-size: 15px; font-weight: 600; color: var(--text); }
 .geo-empty-desc { font-size: 13px; color: var(--text-muted); max-width: 360px; }
+
+/* ============================================================
+   Election form (Create Election)
+   ============================================================ */
+.election-form { display: flex; flex-direction: column; gap: 18px; }
+.form-grid {
+  display: grid; gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+.rules-grid {
+  display: grid; gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  padding: 16px;
+  background: #fafafa;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+}
+.rule-toggle {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius-input);
+  font-size: 13px; color: var(--text);
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+.rule-toggle:hover { background: var(--surface); }
+.rule-toggle > input[type="checkbox"] {
+  width: 14px; height: 14px; accent-color: var(--accent); margin: 0; flex-shrink: 0;
+}
+.rule-toggle > span { line-height: 1.4; }
