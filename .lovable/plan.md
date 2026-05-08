@@ -1,47 +1,79 @@
-# Fix: Admin pages render unstyled (missing UI primitive CSS)
+# Properly design the admin dashboard pages
 
 ## Diagnosis
 
-The Tailwind v4 `@config` fix from the previous turn restored utility classes (`bg-on-background`, `text-headline-md`, etc.) used by the layout/sidebar. But the admin **pages** look unstyled because the shared UI primitives in `src/components/ui/` rely on a set of custom CSS classes that **are not defined anywhere in the project**:
+The admin pages are not "empty" — most are 150–400 lines of real markup with forms, tables, charts, and side panels. The reason they look unstyled is that the JSX references **~50 custom CSS class names that are not defined anywhere in the project**. The previous fix added the `ui-*` primitives (Button/Badge/Card/Input). Page-level layout classes are still missing.
 
-- `Button.tsx` → `ui-button`, `ui-button-primary|secondary|danger|ghost`
-- `Badge.tsx` → `ui-badge`, `ui-badge-neutral|success|warning|danger|info`
-- `Card.tsx` → `ui-card`, `ui-card-header`, `ui-card-title`, `ui-card-description`, `ui-card-content`
-- `Form.tsx` → `ui-field`, `ui-field-label`, `ui-input`, `ui-textarea`
+Verified missing classes, grouped by namespace:
 
-Searching `frontend/src/styles.css`, `styles.clean.css`, and the rest of the source confirms zero matches for any of these class names. So every Button/Badge/Card/Input rendered on dashboard, elections, voters, candidates, etc. is currently a bare HTML element with no styling.
+- **Auth (SignUp / ForgotPassword)**: `auth-shell`, `auth-panel`, `auth-header`, `auth-form`, `auth-input-wrap`, `auth-error-text`, `auth-success`, `auth-back-link`
+- **Dashboard**: `hero`, `eyebrow`, `dashboard-summary-grid`, `dashboard-activity`, `dashboard-activity-list`, `dashboard-alert`, `dashboard-alert-grid`, `section-grid`, `section-card`, `section-card-link`, `section-title-row`, `section-icon`, `stat-card`
+- **Elections**: `elections-layout`, `elections-main`, `elections-side`, `election-list`
+- **Geography / Voters / Parties / Candidates / AdminUsers / etc.** (shared `geo-*` table+form pattern): `geo-workspace`, `geo-form-card`, `geo-form-grid`, `geo-form`, `geo-form-actions`, `geo-list-card`, `geo-list-header`, `geo-search-box`, `geo-search-input`, `geo-checkbox`, `geo-table`, `geo-table-header`, `geo-table-body`, `geo-table-row`, `geo-col-name`, `geo-col-code`, `geo-col-status`, `geo-col-actions`, `geo-status-badge`, `geo-status-active`, `geo-empty-state`, `geo-empty-title`, `geo-empty-desc`
 
-(Side note: `Input.tsx` and `Form.tsx` both export `Input` — that's a separate cleanup, not the cause of the missing styles.)
+All 16 pages use some combination of these.
 
-## Fix
+## Approach
 
-Add a `ui-*` component layer to `frontend/src/styles.css` that styles all the primitives using the design tokens already defined in `tailwind.config.cjs` / `DESIGN.md` (Apex Architectural — cobalt primary, Hanken Grotesk + Inter, 8px rhythm, 0.5rem radius).
+Add a single page-design layer to `frontend/src/styles.css` implementing every missing class with the Apex Architectural design system (cobalt primary, Hanken Grotesk + Inter, 8px rhythm, glassmorphic cards). No JSX changes — markup stays intact, styles light up everywhere at once.
 
-Concretely, append rules for:
+### Style spec by namespace
 
-- **`.ui-button`** — base: inline-flex, `font-label-lg`, `rounded-lg`, `px-4 py-2`, focus ring on `primary`. Variants:
-  - `primary` → `bg-primary text-on-primary` + hover darken
-  - `secondary` → `bg-surface-container text-on-surface` + 1px `outline-variant` border
-  - `danger` → `bg-error text-on-error`
-  - `ghost` → transparent + `hover:bg-surface-container`
-- **`.ui-badge`** — `inline-flex`, `rounded-full`, `px-2.5 py-0.5`, `font-label-md`. Tones use soft tinted backgrounds:
-  - neutral: `surface-container` / `on-surface-variant`
-  - success: soft green tint
-  - warning: soft amber tint
-  - danger: `error-container` / `on-error-container`
-  - info: `tertiary-container` / `on-tertiary-container`
-- **`.ui-card`** — `bg-surface-container-lowest`, 1px `outline-variant` border, `rounded-xl`, `p-gutter`, `space-y-stack-md`. Plus `ui-card-header` (flex column gap), `ui-card-title` (`font-headline-md`), `ui-card-description` (`text-on-surface-variant font-body-md`), `ui-card-content` (`space-y-stack-sm`).
-- **`.ui-field`** — flex column, `gap-stack-sm`, with `ui-field-label` as `font-label-lg text-on-surface-variant`.
-- **`.ui-input`** — full-width, `bg-surface-container-lowest`, 1px `outline-variant` border, `rounded-lg`, `px-3 py-2`, `font-body-md`, focus → 2px `primary` ring. `ui-textarea` adds `min-h-[120px] resize-y`.
+**Layout shells**
+- `.auth-shell` — full-viewport flex center, `bg-surface` with subtle radial cobalt gradient
+- `.auth-panel` — max-w-md card, `bg-surface-container-lowest`, `rounded-xl`, `outline-variant` border, generous padding, ambient shadow
+- `.auth-header` — flex column, brand mark + `font-headline-lg` title + `text-on-surface-variant` subtitle
+- `.auth-form`, `.auth-input-wrap` — vertical stack with `gap-stack-md`, input wrapper supports leading icon
+- `.auth-error-text` — `text-error font-label-md`, `.auth-success` — soft green tint pill, `.auth-back-link` — primary text link
 
-Implementation approach: write these as plain CSS rules inside `styles.css` using `@apply` with the v4 utilities (now that `@config` is loading the JS theme), or use raw CSS with `var(--*)` for the theme tokens. `@apply` keeps things terse and consistent with the existing tokens.
+**Dashboard composition**
+- `.hero` — `glass-card` panel with cobalt gradient overlay, `font-display-md` headline, supporting copy, action row
+- `.eyebrow` — `font-label-md uppercase tracking-wider text-primary`
+- `.dashboard-summary-grid` — responsive grid (1/2/3 cols) of `stat-card`s
+- `.stat-card` — `ui-card` variant: small label, `font-display-md` value, optional delta chip
+- `.dashboard-activity` / `.dashboard-activity-list` — card with hairline-divided rows, timestamp on right
+- `.dashboard-alert-grid`, `.dashboard-alert` — soft-tinted alert cards with status icon
+- `.section-grid` — responsive grid of `section-card`
+- `.section-card` — clickable card with `section-icon` (rounded square chip), title row, description, hover lift
+- `.section-card-link` — full-card anchor, focus ring on primary
+- `.section-title-row` — flex between title and right-aligned action
+- `.section-icon` — 40px square `bg-primary-container text-on-primary-container rounded-lg flex center`
 
-## Out of scope (mention only)
+**Elections workspace**
+- `.elections-layout` — 2-col grid on lg (main + side panel), single col on mobile
+- `.elections-main`, `.elections-side` — content columns with `space-y-stack-lg`
+- `.election-list` — vertical stack of election cards with hairline dividers
 
-- The duplicate `Input` export in `components/ui/Form.tsx` vs `Input.tsx`.
-- Deleting the unused `styles.clean.css`.
-- Migrating long-term to a v4-native `@theme` block.
+**Shared CRUD workspace (`geo-*`)** — used by Geography, Voters, Parties, Candidates, AdminUsers, etc.
+- `.geo-workspace` — 2-col grid (form left, list right) on lg, stacks on mobile, `gap-stack-lg`
+- `.geo-form-card`, `.geo-list-card` — `ui-card` with sticky header
+- `.geo-form` — `flex flex-col gap-stack-md`
+- `.geo-form-grid` — 2-col responsive grid of fields
+- `.geo-form-actions` — right-aligned button row, top hairline divider
+- `.geo-list-header` — flex between count title and search box
+- `.geo-search-box` — input wrapper with leading `Search` icon, `.geo-search-input` styles inner input
+- `.geo-checkbox` — primary-tinted checkbox
+- `.geo-table` — outer wrapper with subtle border + rounded corners
+- `.geo-table-header` — grid row with `font-label-lg uppercase text-on-surface-variant`, `bg-surface-container-low`
+- `.geo-table-body` — list with hairline dividers between rows
+- `.geo-table-row` — grid row, hover `bg-surface-container-low`, `font-body-md`
+- `.geo-col-name` (flex 2), `.geo-col-code` (mono `font-label-md`), `.geo-col-status` (chip), `.geo-col-actions` (right-aligned ghost icon buttons)
+- `.geo-status-badge` — base pill, `.geo-status-active` cobalt tint; add `geo-status-pending`, `geo-status-suspended`, `geo-status-archived` while we're at it
+- `.geo-empty-state` — centered, dashed border, muted icon, `.geo-empty-title` headline-sm, `.geo-empty-desc` body-md text-on-surface-variant
 
-## Verification
+### Implementation method
 
-Reload the admin app and visit a few pages (Dashboard, Elections, Voters). Buttons should be cobalt with white text, cards should be white panels with subtle borders, badges should be soft pills, inputs should have visible borders and a primary focus ring.
+Write all rules in `frontend/src/styles.css` using `@apply` against the v4 utilities (config already wired). Use raw CSS only for things `@apply` can't express (radial gradients, hairline borders via `box-shadow inset`, status-tinted backgrounds where no token exists).
+
+### Verification
+
+After writing the styles:
+1. Reload the admin app
+2. Walk through Dashboard, Elections, Voters, Geography, Parties, Candidates, BiometricReview, Monitoring, Results, AuditLogs, AdminUsers, Settings, SignUp
+3. Confirm: hero gradients render, cards have white surfaces with subtle borders, tables show clean rows with status pills, forms align to the 2-col grid, buttons use cobalt primary, focus states show the cobalt ring
+
+## Out of scope
+
+- Page logic / data shape changes (e.g. the `localStorage` patterns on `VotersPage`)
+- Replacing custom classes with raw Tailwind utilities (bigger refactor — can be a follow-up)
+- Mobile sidebar collapse behavior (separate task)
