@@ -145,14 +145,13 @@
   @apply font-label-md text-label-md uppercase tracking-wider text-primary;
 }
 .hero {
-  @apply relative overflow-hidden rounded-xl p-stack-lg space-y-stack-md;
-  background: linear-gradient(135deg, #003ec7 0%, #0052ff 60%, #006e95 100%);
-  color: #ffffff;
-  box-shadow: 0 20px 50px -25px rgba(0, 62, 199, 0.5);
+  @apply relative overflow-hidden rounded-xl p-stack-lg space-y-stack-md
+         bg-surface-container-lowest border border-outline-variant;
 }
-.hero h1 { @apply font-display-md text-display-md text-on-primary; }
-.hero p  { @apply font-body-lg text-body-lg opacity-90; }
-.hero .eyebrow { color: #b7c4ff; }
+.hero h1 { @apply font-display-md text-display-md text-on-surface leading-tight; }
+.hero p  { @apply font-body-md text-body-md text-on-surface-variant max-w-2xl; }
+.hero .eyebrow { @apply mb-stack-sm; }
+
 
 .dashboard-summary-grid {
   @apply grid gap-stack-md;
@@ -162,8 +161,10 @@
   @apply bg-surface-container-lowest border border-outline-variant rounded-xl p-stack-md flex flex-col gap-stack-sm transition-all;
 }
 .stat-card:hover { box-shadow: 0 10px 30px -15px rgba(11, 28, 48, 0.2); }
-.stat-card .stat-label { @apply font-label-md text-label-md uppercase tracking-wider text-on-surface-variant; }
-.stat-card .stat-value { @apply font-display-md text-display-md text-on-surface; }
+.stat-card > span   { @apply font-label-md text-label-md uppercase tracking-wider text-on-surface-variant; }
+.stat-card > strong { @apply font-display-md text-display-md text-primary; }
+.stat-card > small  { @apply font-body-md text-body-md text-on-surface-variant; }
+
 
 .dashboard-activity {
   @apply bg-surface-container-lowest border border-outline-variant rounded-xl p-stack-md;
