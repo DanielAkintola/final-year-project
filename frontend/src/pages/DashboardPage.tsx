@@ -268,42 +268,41 @@ export function DashboardPage() {
         </div>
 
         {/* Side Analytics: Party Counts & Leaderboard */}
-        <div className="lg:col-span-4 space-y-gutter">
-          {/* Leader Card */}
+        <div className="lg:col-span-5 flex flex-col gap-4">
           <LeaderCard
             candidateName="Chief Olumide Adeyemi"
             partyName="All Progressives Congress (APC)"
             votes={945302}
             percentage={50.4}
           />
-
-          {/* Party Breakdown */}
           <PartyPerformanceChart parties={partyPerformanceData} />
-
-          {/* Security Monitoring */}
           <SecurityMonitoringCard alerts={securityAlerts} />
         </div>
       </div>
 
-      {/* Navigation Sections Grid */}
-      <div className="pt-stack-lg border-t border-outline-variant">
-        <h2 className="font-headline-md text-on-background mb-stack-lg">
-          Available Modules
-        </h2>
+      {/* Modules */}
+      <section className="flex flex-col gap-4">
+        <div className="flex items-end justify-between">
+          <h2 style={{ fontSize: 16, fontWeight: 600, color: "var(--text)", letterSpacing: "-0.005em" }}>
+            Modules
+          </h2>
+          <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
+            {visibleNavigation.length} available
+          </span>
+        </div>
         <div className="section-grid">
           {visibleNavigation.map((item) => (
             <SectionCard item={item} key={item.path} />
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* Footer */}
-      <footer className="p-gutter text-center border-t border-outline-variant mt-stack-lg">
-        <p className="text-label-md text-outline">
-          © 2024 Ondo State Independent Electoral Commission (ODIEC). All
-          election data is encrypted and verified via decentralized consensus.
+      <footer style={{ paddingTop: 24, borderTop: "1px solid var(--border)", textAlign: "center" }}>
+        <p style={{ fontSize: 11, color: "var(--text-subtle)" }}>
+          © 2024 Ondo State Independent Electoral Commission (ODIEC). All election data is encrypted and verified via decentralized consensus.
         </p>
       </footer>
     </div>
   );
 }
+
