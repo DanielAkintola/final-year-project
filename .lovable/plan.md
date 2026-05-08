@@ -1,79 +1,120 @@
-# Properly design the admin dashboard pages
 
-## Diagnosis
+# Admin Dashboard Redesign — Clean Minimal (Linear/Vercel)
 
-The admin pages are not "empty" — most are 150–400 lines of real markup with forms, tables, charts, and side panels. The reason they look unstyled is that the JSX references **~50 custom CSS class names that are not defined anywhere in the project**. The previous fix added the `ui-*` primitives (Button/Badge/Card/Input). Page-level layout classes are still missing.
+Goal: replace the current glass/gradient look with a quiet, monochrome, content-first interface across every admin page. Tighten spacing, restructure layouts, and unify primitives so each page feels like part of one product.
 
-Verified missing classes, grouped by namespace:
+## Design language
 
-- **Auth (SignUp / ForgotPassword)**: `auth-shell`, `auth-panel`, `auth-header`, `auth-form`, `auth-input-wrap`, `auth-error-text`, `auth-success`, `auth-back-link`
-- **Dashboard**: `hero`, `eyebrow`, `dashboard-summary-grid`, `dashboard-activity`, `dashboard-activity-list`, `dashboard-alert`, `dashboard-alert-grid`, `section-grid`, `section-card`, `section-card-link`, `section-title-row`, `section-icon`, `stat-card`
-- **Elections**: `elections-layout`, `elections-main`, `elections-side`, `election-list`
-- **Geography / Voters / Parties / Candidates / AdminUsers / etc.** (shared `geo-*` table+form pattern): `geo-workspace`, `geo-form-card`, `geo-form-grid`, `geo-form`, `geo-form-actions`, `geo-list-card`, `geo-list-header`, `geo-search-box`, `geo-search-input`, `geo-checkbox`, `geo-table`, `geo-table-header`, `geo-table-body`, `geo-table-row`, `geo-col-name`, `geo-col-code`, `geo-col-status`, `geo-col-actions`, `geo-status-badge`, `geo-status-active`, `geo-empty-state`, `geo-empty-title`, `geo-empty-desc`
+- **Surfaces**: flat white (`--surface`) on a soft gray app background (`--surface-container-low`). No gradients, no glass blur, no large shadows. Borders use `--outline-variant` at 1px.
+- **Accent**: a single cobalt accent reserved for primary actions, active nav, focus rings, and key metric values. Everything else is neutral grayscale.
+- **Typography**: clear hierarchy — small uppercase eyebrow (11px, tracked), page title (28px), section title (18px), body (14px), meta (12px muted). Numbers use tabular figures.
+- **Spacing rhythm**: 4 / 8 / 12 / 16 / 24 / 32 / 48. Cards use 24px internal padding, 16px gap between siblings, 32px between major sections.
+- **Radii**: 10px on cards, 8px on inputs/buttons, 6px on chips. No oversized rounding.
+- **Motion**: only 120ms ease for hover/focus. No translateY lift on cards.
 
-All 16 pages use some combination of these.
+## Shared layout restructure
 
-## Approach
+```text
+┌──────────────────────────────────────────────────────────┐
+│ TopAppBar  — slim, 56px, no shadow, border-bottom only   │
+├──────────┬───────────────────────────────────────────────┤
+│          │  PageHeader (eyebrow • title • description •  │
+│ Sidebar  │              right-aligned actions)           │
+│  240px   ├───────────────────────────────────────────────┤
+│  grouped │  Content (max-width 1280, 32px gutter)        │
+│  nav     │                                                │
+│          │                                                │
+└──────────┴───────────────────────────────────────────────┘
+```
 
-Add a single page-design layer to `frontend/src/styles.css` implementing every missing class with the Apex Architectural design system (cobalt primary, Hanken Grotesk + Inter, 8px rhythm, glassmorphic cards). No JSX changes — markup stays intact, styles light up everywhere at once.
+- **Sidebar**: grouped sections with quiet labels (Operations / Identity / Governance / System). Active item gets a 2px left accent bar, nothing else.
+- **TopAppBar**: just brand, breadcrumb, search, user menu. Remove decorative gradients.
+- **PageHeader**: new shared component used by every page — replaces inconsistent hero blocks.
 
-### Style spec by namespace
+## Page-by-page restructure
 
-**Layout shells**
-- `.auth-shell` — full-viewport flex center, `bg-surface` with subtle radial cobalt gradient
-- `.auth-panel` — max-w-md card, `bg-surface-container-lowest`, `rounded-xl`, `outline-variant` border, generous padding, ambient shadow
-- `.auth-header` — flex column, brand mark + `font-headline-lg` title + `text-on-surface-variant` subtitle
-- `.auth-form`, `.auth-input-wrap` — vertical stack with `gap-stack-md`, input wrapper supports leading icon
-- `.auth-error-text` — `text-error font-label-md`, `.auth-success` — soft green tint pill, `.auth-back-link` — primary text link
+### Dashboard
+New top-down flow instead of the current map-dominant grid:
 
-**Dashboard composition**
-- `.hero` — `glass-card` panel with cobalt gradient overlay, `font-display-md` headline, supporting copy, action row
-- `.eyebrow` — `font-label-md uppercase tracking-wider text-primary`
-- `.dashboard-summary-grid` — responsive grid (1/2/3 cols) of `stat-card`s
-- `.stat-card` — `ui-card` variant: small label, `font-display-md` value, optional delta chip
-- `.dashboard-activity` / `.dashboard-activity-list` — card with hairline-divided rows, timestamp on right
-- `.dashboard-alert-grid`, `.dashboard-alert` — soft-tinted alert cards with status icon
-- `.section-grid` — responsive grid of `section-card`
-- `.section-card` — clickable card with `section-icon` (rounded square chip), title row, description, hover lift
-- `.section-card-link` — full-card anchor, focus ring on primary
-- `.section-title-row` — flex between title and right-aligned action
-- `.section-icon` — 40px square `bg-primary-container text-on-primary-container rounded-lg flex center`
+```text
+[ PageHeader: "Live operations" + Refresh button ]
 
-**Elections workspace**
-- `.elections-layout` — 2-col grid on lg (main + side panel), single col on mobile
-- `.elections-main`, `.elections-side` — content columns with `space-y-stack-lg`
-- `.election-list` — vertical stack of election cards with hairline dividers
+[ KPI strip: 4 stat tiles in one row — Votes • Turnout • Units reporting • Alerts ]
 
-**Shared CRUD workspace (`geo-*`)** — used by Geography, Voters, Parties, Candidates, AdminUsers, etc.
-- `.geo-workspace` — 2-col grid (form left, list right) on lg, stacks on mobile, `gap-stack-lg`
-- `.geo-form-card`, `.geo-list-card` — `ui-card` with sticky header
-- `.geo-form` — `flex flex-col gap-stack-md`
-- `.geo-form-grid` — 2-col responsive grid of fields
-- `.geo-form-actions` — right-aligned button row, top hairline divider
-- `.geo-list-header` — flex between count title and search box
-- `.geo-search-box` — input wrapper with leading `Search` icon, `.geo-search-input` styles inner input
-- `.geo-checkbox` — primary-tinted checkbox
-- `.geo-table` — outer wrapper with subtle border + rounded corners
-- `.geo-table-header` — grid row with `font-label-lg uppercase text-on-surface-variant`, `bg-surface-container-low`
-- `.geo-table-body` — list with hairline dividers between rows
-- `.geo-table-row` — grid row, hover `bg-surface-container-low`, `font-body-md`
-- `.geo-col-name` (flex 2), `.geo-col-code` (mono `font-label-md`), `.geo-col-status` (chip), `.geo-col-actions` (right-aligned ghost icon buttons)
-- `.geo-status-badge` — base pill, `.geo-status-active` cobalt tint; add `geo-status-pending`, `geo-status-suspended`, `geo-status-archived` while we're at it
-- `.geo-empty-state` — centered, dashed border, muted icon, `.geo-empty-title` headline-sm, `.geo-empty-desc` body-md text-on-surface-variant
+[ Two-column 7/5 ]
+  ├ Vote distribution map (taller, no overlay clutter — 2 chips max)
+  └ Leader card + Party performance (stacked)
 
-### Implementation method
+[ Two-column 1/1 ]
+  ├ Voting pace chart
+  └ Turnout progress
 
-Write all rules in `frontend/src/styles.css` using `@apply` against the v4 utilities (config already wired). Use raw CSS only for things `@apply` can't express (radial gradients, hairline borders via `box-shadow inset`, status-tinted backgrounds where no token exists).
+[ Full width: Security & activity — two columns of compact lists ]
 
-### Verification
+[ Modules grid — small icon tiles, 4 per row, neutral ]
+```
 
-After writing the styles:
-1. Reload the admin app
-2. Walk through Dashboard, Elections, Voters, Geography, Parties, Candidates, BiometricReview, Monitoring, Results, AuditLogs, AdminUsers, Settings, SignUp
-3. Confirm: hero gradients render, cards have white surfaces with subtle borders, tables show clean rows with status pills, forms align to the 2-col grid, buttons use cobalt primary, focus states show the cobalt ring
+### Elections
+- Left: list of elections (compact rows, status chip, dates).
+- Right: detail panel (sticky on desktop). Form opens in a slide-over, not inline.
+
+### Voters / Candidates / Parties / Geography / AdminUsers (CRUD pages)
+Unified pattern:
+- PageHeader with primary "New" action.
+- Filter bar: search + status chips + result count.
+- Table: zebra-free, 48px row height, hover background only, action icons revealed on row hover.
+- Empty state: centered, single line + action.
+- Create/edit moves to a slide-over drawer (right side, 480px) instead of split-screen.
+
+### Results
+- KPI strip (total votes, turnout, leading party, margin).
+- Map (full width, 60vh).
+- Below: leader card + party bars side-by-side, then per-LGA table.
+
+### Ballot Builder
+- Two-pane: left builder canvas, right live preview. Sticky toolbar at top.
+
+### Biometric Review
+- Queue list (left, 360px) + reviewer detail (right). Approve/Reject as primary/secondary buttons in a footer bar.
+
+### Monitoring / Audit Logs
+- Dense table with virtualized rows, sticky filter bar, timestamp column right-aligned.
+
+### Settings
+- Left rail of setting groups, right content panel. Each setting row: label + description + control on the right.
+
+### Auth pages (Login / SignUp / ForgotPassword)
+- Centered 400px card on plain background (drop the radial gradients). Single accent button.
+
+## Token & primitive updates (`frontend/src/styles.css`)
+
+- Rewrite `.hero` → `.page-header` (no card chrome, just spacing + border-bottom).
+- Rewrite `.stat-card` → flat tile: label (muted, uppercase 11px), value (28px, tabular), delta (12px).
+- New `.kpi-strip` grid (4 cols, collapses 2/1).
+- New `.data-table`, `.toolbar`, `.filter-chip`, `.drawer`, `.empty-state`, `.section-header`.
+- Tighten `.ui-button` (h-9, 13px label), `.ui-card` (p-6, radius-10, no hover transform).
+- Remove `.glass-card` usage from components; keep class as no-op for safety.
+- Sidebar: new `.nav-group`, `.nav-group-label`, `.nav-item`, `.nav-item-active` (2px left bar).
+
+## New / changed components
+
+- New: `frontend/src/components/PageHeader.tsx` (replaces ad-hoc HeroSection usage on inner pages).
+- New: `frontend/src/components/ui/Drawer.tsx` (right-side slide-over for forms).
+- New: `frontend/src/components/ui/DataTable.tsx` (consistent table chrome).
+- New: `frontend/src/components/ui/Toolbar.tsx` (search + filters + actions row).
+- New: `frontend/src/components/KpiTile.tsx` (replaces `StatCard` visual).
+- Update: `HeroSection`, `Sidebar`, `TopAppBar`, `SectionCard`, `LeaderCard`, `PartyPerformanceChart`, all page files to use the new primitives.
 
 ## Out of scope
 
-- Page logic / data shape changes (e.g. the `localStorage` patterns on `VotersPage`)
-- Replacing custom classes with raw Tailwind utilities (bigger refactor — can be a follow-up)
-- Mobile sidebar collapse behavior (separate task)
+- No backend / data / route changes.
+- No new dependencies.
+- Charts keep current libraries; only their container chrome changes.
+
+## Acceptance
+
+- Every admin page uses `PageHeader` + the same gutter and max-width.
+- No gradients, no backdrop-blur, no shadow > `0 1px 2px rgba(0,0,0,.04)` outside drawers/menus.
+- Single accent color appears only on primary actions, active nav, focus, and headline metrics.
+- All CRUD pages share identical toolbar + table + drawer pattern.
+- Viewport at 954px (current) renders without horizontal scroll and collapses KPI strip to 2 columns.
