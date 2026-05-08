@@ -161,8 +161,10 @@
   @apply bg-surface-container-lowest border border-outline-variant rounded-xl p-stack-md flex flex-col gap-stack-sm transition-all;
 }
 .stat-card:hover { box-shadow: 0 10px 30px -15px rgba(11, 28, 48, 0.2); }
-.stat-card .stat-label { @apply font-label-md text-label-md uppercase tracking-wider text-on-surface-variant; }
-.stat-card .stat-value { @apply font-display-md text-display-md text-on-surface; }
+.stat-card > span   { @apply font-label-md text-label-md uppercase tracking-wider text-on-surface-variant; }
+.stat-card > strong { @apply font-display-md text-display-md text-primary; }
+.stat-card > small  { @apply font-body-md text-body-md text-on-surface-variant; }
+
 
 .dashboard-activity {
   @apply bg-surface-container-lowest border border-outline-variant rounded-xl p-stack-md;
