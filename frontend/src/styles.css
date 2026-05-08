@@ -102,3 +102,183 @@
 .ui-textarea {
   @apply min-h-[120px] resize-y;
 }
+
+/* ============================================================
+   Auth pages
+   ============================================================ */
+.auth-shell {
+  min-height: 100vh;
+  @apply flex items-center justify-center p-gutter bg-surface;
+  background-image: radial-gradient(circle at 20% 10%, rgba(0, 82, 255, 0.12), transparent 50%),
+                    radial-gradient(circle at 80% 90%, rgba(0, 110, 149, 0.10), transparent 55%);
+}
+.auth-panel {
+  @apply w-full max-w-md bg-surface-container-lowest border border-outline-variant rounded-xl p-stack-lg space-y-stack-lg;
+  box-shadow: 0 20px 60px -30px rgba(11, 28, 48, 0.3);
+}
+.auth-header {
+  @apply flex flex-col gap-stack-sm text-center;
+}
+.auth-header h1 { @apply font-headline-lg text-headline-lg text-on-surface; }
+.auth-header p  { @apply font-body-md text-body-md text-on-surface-variant; }
+.auth-form { @apply flex flex-col gap-stack-md; }
+.auth-input-wrap { @apply relative flex flex-col gap-stack-sm; }
+.auth-input-wrap > svg {
+  @apply absolute left-3 top-9 text-on-surface-variant pointer-events-none;
+}
+.auth-input-wrap input { @apply pl-10; }
+.auth-error-text {
+  @apply font-label-md text-label-md text-on-error-container bg-error-container rounded px-3 py-2;
+}
+.auth-success {
+  @apply font-label-md text-label-md rounded px-3 py-2;
+  background: #dcfce7; color: #166534;
+}
+.auth-back-link {
+  @apply inline-flex items-center gap-1 font-label-lg text-label-lg text-primary hover:underline;
+}
+
+/* ============================================================
+   Dashboard
+   ============================================================ */
+.eyebrow {
+  @apply font-label-md text-label-md uppercase tracking-wider text-primary;
+}
+.hero {
+  @apply relative overflow-hidden rounded-xl p-stack-lg space-y-stack-md;
+  background: linear-gradient(135deg, #003ec7 0%, #0052ff 60%, #006e95 100%);
+  color: #ffffff;
+  box-shadow: 0 20px 50px -25px rgba(0, 62, 199, 0.5);
+}
+.hero h1 { @apply font-display-md text-display-md text-on-primary; }
+.hero p  { @apply font-body-lg text-body-lg opacity-90; }
+.hero .eyebrow { color: #b7c4ff; }
+
+.dashboard-summary-grid {
+  @apply grid gap-stack-md;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+.stat-card {
+  @apply bg-surface-container-lowest border border-outline-variant rounded-xl p-stack-md flex flex-col gap-stack-sm transition-all;
+}
+.stat-card:hover { box-shadow: 0 10px 30px -15px rgba(11, 28, 48, 0.2); }
+.stat-card .stat-label { @apply font-label-md text-label-md uppercase tracking-wider text-on-surface-variant; }
+.stat-card .stat-value { @apply font-display-md text-display-md text-on-surface; }
+
+.dashboard-activity {
+  @apply bg-surface-container-lowest border border-outline-variant rounded-xl p-stack-md;
+}
+.dashboard-activity-list { @apply flex flex-col divide-y divide-outline-variant; }
+.dashboard-activity-list > * { @apply py-stack-sm flex items-center justify-between gap-stack-md; }
+
+.dashboard-alert-grid {
+  @apply grid gap-stack-md;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+.dashboard-alert {
+  @apply rounded-xl border border-outline-variant p-stack-md flex items-start gap-stack-sm bg-surface-container-low;
+}
+
+.section-grid {
+  @apply grid gap-stack-md;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+.section-card {
+  @apply relative bg-surface-container-lowest border border-outline-variant rounded-xl p-stack-md flex flex-col gap-stack-sm transition-all;
+}
+.section-card:hover {
+  box-shadow: 0 12px 32px -16px rgba(0, 62, 199, 0.25);
+  transform: translateY(-2px);
+}
+.section-card-link { @apply absolute inset-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary; }
+.section-title-row { @apply flex items-center justify-between gap-stack-sm; }
+.section-icon {
+  @apply w-10 h-10 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center;
+}
+
+/* ============================================================
+   Elections
+   ============================================================ */
+.elections-layout {
+  @apply grid gap-stack-lg;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 1024px) {
+  .elections-layout { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+}
+.elections-main, .elections-side { @apply flex flex-col gap-stack-lg; }
+.election-list { @apply flex flex-col divide-y divide-outline-variant; }
+.election-list > * { @apply py-stack-md; }
+
+/* ============================================================
+   Shared CRUD workspace (geo-*)
+   ============================================================ */
+.geo-workspace {
+  @apply grid gap-stack-lg;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 1024px) {
+  .geo-workspace { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); align-items: start; }
+}
+.geo-form-card, .geo-list-card {
+  @apply bg-surface-container-lowest border border-outline-variant rounded-xl;
+}
+.geo-form { @apply flex flex-col gap-stack-md; }
+.geo-form-grid {
+  @apply grid gap-stack-md;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+.geo-form-actions {
+  @apply flex justify-end gap-stack-sm pt-stack-md border-t border-outline-variant;
+}
+
+.geo-list-header {
+  @apply flex flex-wrap items-center justify-between gap-stack-sm mb-stack-md;
+}
+.geo-search-box { @apply relative flex-1 min-w-[200px]; }
+.geo-search-box > svg {
+  @apply absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none;
+}
+.geo-search-input {
+  @apply w-full bg-surface-container-low border border-outline-variant rounded-lg pl-10 pr-3 py-2 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary;
+}
+.geo-checkbox {
+  @apply w-4 h-4 rounded border border-outline-variant accent-primary;
+}
+
+.geo-table {
+  @apply border border-outline-variant rounded-lg overflow-hidden;
+}
+.geo-table-header {
+  @apply grid gap-stack-sm px-stack-md py-stack-sm bg-surface-container-low font-label-md text-label-md uppercase tracking-wider text-on-surface-variant;
+  grid-template-columns: 2fr 1fr 1fr auto;
+}
+.geo-table-body { @apply flex flex-col divide-y divide-outline-variant; }
+.geo-table-row {
+  @apply grid gap-stack-sm px-stack-md py-stack-sm items-center font-body-md text-body-md text-on-surface transition-colors;
+  grid-template-columns: 2fr 1fr 1fr auto;
+}
+.geo-table-row:hover { @apply bg-surface-container-low; }
+
+.geo-col-name strong { @apply font-label-lg text-label-lg text-on-surface; }
+.geo-col-code code {
+  @apply font-mono font-label-md text-label-md bg-surface-container px-2 py-0.5 rounded;
+}
+.geo-col-actions {
+  @apply flex justify-end gap-stack-sm;
+}
+
+.geo-status-badge {
+  @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 font-label-md text-label-md uppercase tracking-wider;
+}
+.geo-status-active     { @apply bg-primary-fixed text-on-primary-fixed; }
+.geo-status-pending    { background: #fef3c7; color: #92400e; }
+.geo-status-suspended  { @apply bg-error-container text-on-error-container; }
+.geo-status-archived   { @apply bg-surface-container text-on-surface-variant; }
+
+.geo-empty-state {
+  @apply flex flex-col items-center justify-center text-center gap-stack-sm py-stack-lg px-stack-md rounded-lg;
+  border: 1px dashed var(--color-outline-variant, #c3c5d9);
+}
+.geo-empty-title { @apply font-headline-sm text-headline-sm text-on-surface; }
+.geo-empty-desc  { @apply font-body-md text-body-md text-on-surface-variant max-w-md; }
