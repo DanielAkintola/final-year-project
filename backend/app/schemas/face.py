@@ -6,6 +6,10 @@ class EnrollmentResponse(BaseModel):
     status: str
     message: str
 
+class GetResponse(BaseModel):
+    voter_id: str
+    data: str
+
 
 class VerificationResponse(BaseModel):
     voter_id: str

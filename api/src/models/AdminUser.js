@@ -15,6 +15,7 @@ const adminUserSchema = new Schema(
     assignedLgas: [{ type: Schema.Types.ObjectId, ref: 'Lga' }],
     isActive: { type: Boolean, default: true },
     twoFactorEnabled: { type: Boolean, default: false },
+    passwordChangeRequired: { type: Boolean, default: true },
     lastLoginAt: { type: Date },
   },
   { timestamps: true }
