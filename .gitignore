@@ -45,6 +45,7 @@ yarn-error.log*
 pnpm-debug.log*
 
 # Frontend (Vite/React)
+frontend/node_modules/
 frontend/.vite/
 frontend/dist/
 frontend/build/

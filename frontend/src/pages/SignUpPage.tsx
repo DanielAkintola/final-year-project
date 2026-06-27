@@ -77,17 +77,17 @@ export function SignUpPage() {
       <div className="absolute top-20 left-20 w-16 h-16 border-4 border-[#1B365D]/5 rounded-xl rotate-12 z-0" />
       <div className="absolute bottom-1/4 right-10 w-24 h-24 border-2 border-[#2E5AAC]/10 rounded-full z-0" />
 
-      {/* --- 75% SCALE WRAPPER --- */}
-      <div className="scale-[0.75] transform z-10 flex items-center justify-center">
-        {/* MAIN CARD */}
-        <div className="relative w-[850px] h-[600px] bg-white rounded-[32px] shadow-2xl overflow-hidden flex border border-white/20">
+      {/* --- SCALE WRAPPER (increased) --- */}
+      <div className="scale-[0.85] transform z-10 flex items-center justify-center">
+        {/* MAIN CARD (increased size) */}
+        <div className="relative w-[980px] h-[720px] bg-white rounded-[32px] shadow-2xl overflow-hidden flex border border-white/20">
           {/* ADMIN SIGN UP FORM (Left Side) */}
           <div
             className={`absolute top-0 left-0 w-1/2 h-full flex flex-col justify-center p-12 transition-all duration-700 ease-in-out ${isSignUp ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10 pointer-events-none"}`}
           >
             <form
               onSubmit={handleSubmit}
-              className="space-y-4 w-full max-w-[320px] mx-auto text-center"
+              className="space-y-4 w-full max-w-[380px] mx-auto text-center"
             >
               <h1 className="text-3xl font-extrabold text-[#1B365D] mb-2">
                 Admin Registry
@@ -179,7 +179,7 @@ export function SignUpPage() {
           >
             <form
               onSubmit={handleSubmit}
-              className="space-y-6 w-full max-w-[300px] mx-auto text-center"
+              className="space-y-6 w-full max-w-[360px] mx-auto text-center"
             >
               <div className="mb-8">
                 <h1 className="text-3xl font-extrabold text-[#1B365D] mb-2">
