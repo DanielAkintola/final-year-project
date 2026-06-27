@@ -33,7 +33,7 @@ It is designed to support:
 The admin site should support:
 
 - admin login
-- logout__
+- logout
 - password reset
 - optional two-factor authentication
 - role-based access control

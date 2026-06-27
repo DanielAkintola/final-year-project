@@ -14,6 +14,7 @@ const env = {
   jwtSecret: process.env.JWT_SECRET || 'replace-me',
   accessTokenTtl: process.env.ACCESS_TOKEN_TTL || '15m',
   refreshTokenTtl: process.env.REFRESH_TOKEN_TTL || '7d',
+  adminAccessTokenTtl: process.env.ADMIN_ACCESS_TOKEN_TTL || '8h',
 };
 
 module.exports = { env };

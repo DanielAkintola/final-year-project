@@ -13,6 +13,10 @@ The mobile app and admin web app should talk to the Node.js API only. The Python
 
 ### Authentication
 
+- `POST /api/v1/auth/admin/login`
+  Authenticate an admin user with email and password and issue an admin access token.
+- `POST /api/v1/auth/admin/reset-password-with-temp`
+  Allow an admin who is not logged in to set a new password using their email, temporary password, and new password.
 - `POST /api/v1/auth/request-otp`
   Start voter login with phone or voter ID.
 - `POST /api/v1/auth/verify-otp`
@@ -55,6 +59,19 @@ The mobile app and admin web app should talk to the Node.js API only. The Python
 
 ## Admin Web Endpoints
 
+All `/api/v1/admin/*` endpoints require:
+
+- `Authorization: Bearer <admin_access_token>`
+
+### Admin Self-Service
+
+- `GET /api/v1/admin/me`
+  Return the currently authenticated admin based on the Bearer token.
+- `PATCH /api/v1/admin/me`
+  Update the current admin's own basic profile fields such as first name, last name, email, phone, and 2FA setting.
+- `POST /api/v1/admin/admin-users/:adminUserId/change-password`
+  Allow a logged-in admin to change their own password by providing the current password and a new password. The `:adminUserId` must match the authenticated admin.
+
 ### Election Management
 
 - `GET /api/v1/admin/elections`
@@ -69,6 +86,21 @@ The mobile app and admin web app should talk to the Node.js API only. The Python
   Publish an election.
 - `POST /api/v1/admin/elections/:electionId/close`
   Close voting for an election.
+
+### Admin User Management
+
+- `GET /api/v1/admin/admin-users`
+  List admin users, with optional filtering by role, active status, or search text. `SUPER_ADMIN` and `ELECTION_ADMIN`.
+- `GET /api/v1/admin/admin-users/:adminUserId`
+  Get one admin user by ID. `SUPER_ADMIN` and `ELECTION_ADMIN` can read any admin; other admins can only read their own record.
+- `POST /api/v1/admin/admin-users`
+  Create a new admin user and issue a temporary password. `SUPER_ADMIN` only.
+- `PATCH /api/v1/admin/admin-users/:adminUserId`
+  Update editable admin fields. Any authenticated admin can update their own basic profile fields; only `SUPER_ADMIN` can change role, assigned LGAs, and password-change flags.
+- `PATCH /api/v1/admin/admin-users/:adminUserId/status`
+  Activate or deactivate an admin user. `SUPER_ADMIN` only.
+- `POST /api/v1/admin/admin-users/:adminUserId/reset-password`
+  Reset an admin password and issue a fresh temporary password. `SUPER_ADMIN` only.
 
 ### Geography Configuration
 
